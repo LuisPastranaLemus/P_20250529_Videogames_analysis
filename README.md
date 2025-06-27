@@ -1,19 +1,48 @@
-# 🧭 Project Analysis
-Brief Decription
+# 🧭 Project Analysis   
+
+ICE Video Games — Identifying Success Patterns in the Gaming Industry
+
+This project analyzes video game sales data from the global digital retailer **ICE**, aiming to **identify patterns that determine a game's success**. By examining sales, reviews, genres, platforms, and ESRB ratings, we generate actionable insights that can support **marketing strategies** and help **predict promising game releases**.
 
 ---
 
-## 🔍 Project Overview (P-202YMMDD_Name)
+## 🔍 Project Overview (P-20250529_Videogames_analysis)
 
 Project Overview
 
+Uncover what defines a successful video game using historical data — enabling the detection of high-potential projects and the strategic planning of advertising campaigns.
+
 Key questions:
 
-- Objectives to reach
+- Identify how many games were released in different years, focus on periods of time.
+- Observe how sales vary from one platform to another. 
+- Choose the platforms with the highest total sales and construct a distribution based on each year's data. 
+- Look for platforms that used to be popular but are now losing sales. 
+- How long does it generally take for new platforms to appear and old ones to disappear?
+- __Determine__ which period you should collect data for.
+- Work only with the data you consider relevant. Ignore data from previous years.
+- Which platforms are leading in sales? 
+- Which ones are growing and which ones are declining? 
+- Choose several potentially profitable platforms.
+- Show the average sales across various platforms? 
+- See how user and professional reviews affect sales for a popular platform (your choice). 
+- Create a scatter plot and calculate the correlation between reviews and sales.
+- Compare sales of the same games on other platforms.
+- Take a look at the overall distribution of games by genre. 
+- What can be said about the most profitable genres? 
+- Can you generalize about genres with high and low sales?
 
-Project Info explanation
+- Create a user profile for each region
+    For each region (NA, EU, JP), determine:
+    - The top five platforms. Describe the variations in their market shares from region to region.
+    - The top five genres. Explain the differences.
+    - Whether ESRB ratings affect sales in individual regions.
 
-__Note__: key info
+- Test the following hypotheses:
+    - The average user ratings for the Xbox One and PC platforms are the same.
+    - The average user ratings for the Action and Sports genres are different.
+
+__Note__: The dataset contains a "rating" column that stores the ESRB rating for each game. The Entertainment Software Rating Board evaluates a game's content and assigns an age rating of either Teen or Mature.
 
 ---
 
@@ -21,9 +50,18 @@ __Note__: key info
 
 This project has N different tables.
 
-- `dataset.csv` (describe content)
-    `column:name`: description.
-
+- `games.csv` (describe content)
+    `Name`: video game's name
+    `Platform`: video games's platform
+    `Year of Release`: video game's realease date
+    `Genre`: video game's genre
+    `NA_sales` (North American sales in millions of US dollars)
+    `EU_sales` (European sales in millions of US dollars)
+    `JP_sales` (Japanese sales in millions of US dollars)
+    `Other_sales` (Other country sales in millions of US dollars)
+    `Critic_Score` (maximum of 100)
+    `User_Score` (maximum of 10)
+    `Rating` (ESRB)
 
 ---
 
@@ -73,7 +111,6 @@ The notebook `00-guided-analysis_foundations.ipynb` reflects an early stage of m
 - os, pathlib, sys, pandas, NumPy, Matplotlib, seaborn, IPython.display, scipy.stats
 - Jupyter Notebook
 - Git & GitHub for version control
--
 
 ---
 
