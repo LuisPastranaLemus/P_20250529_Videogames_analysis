@@ -6,6 +6,7 @@ import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
 
+
 # Function to detect outlier boundaries with optional clamping of lower bound to zero
 def outlier_limit_bounds(df, column, bound='both', clamp_zero=False):
     """
@@ -61,7 +62,6 @@ def outlier_limit_bounds(df, column, bound='both', clamp_zero=False):
         display(HTML(f"> Invalid 'bound' parameter. Use <b>'both'</b>, <b>'upper'</b>, or <b>'lower'</b>."))
         return None
 
-
 # Function to evaluate the central tendency of a numerical feature
 def evaluate_central_trend(df, column):
     """
@@ -113,15 +113,20 @@ def evaluate_correlation(df):
                     corr_value = df[column_x].corr(df[column_y])
                     
                     if 0.7 < corr_value <= 1.0:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br><b>Strong positive correlation</b>"))
+                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
+                                     <b>Strong positive correlation</b>"))
                     elif 0.3 < corr_value <= 0.7:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br><b>Moderate positive correlation</b>"))
+                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
+                                     <b>Moderate positive correlation</b>"))
                     elif corr_value == 0:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br><b>No linear relationship</b>"))
+                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
+                                     <b>No linear relationship</b>"))
                     elif -0.7 < corr_value <= -0.3:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br><b>Moderate negative correlation</b>"))
+                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
+                                     <b>Moderate negative correlation</b>"))
                     elif -1.0 <= corr_value <= -0.7:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br><b>Strong negative correlation</b>"))
+                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
+                                     <b>Strong negative correlation</b>"))
 
 # Function to visualize missing values within a DataFrame using a heatmap
 def missing_values_heatmap(df):
@@ -230,8 +235,7 @@ def plot_boxplots(ds_list, xlabels, ylabel, title, yticks_range=None, rotation=0
 # Function to plot a histogram with mean and median reference lines
 # plot_histogram(ds=df_product_purchase_quantity['total_products'], bins=range(0, 65, 1), color='grey', title='Distribution for Product Quantity by Orders',
 #                xlabel='Products', ylabel='Frequency', xticks_range=range(0, 65, 5), yticks_range=range(0, 200, 20), rotation=45)
-def plot_histogram(ds, bins=10, color='grey', title='', xlabel='', ylabel='Frequency',
-                   xticks_range=None, yticks_range=None, rotation=0):
+def plot_histogram(ds, bins=10, color='grey', title='', xlabel='', ylabel='Frequency', xticks_range=None, yticks_range=None, rotation=0):
     """
     Plots a histogram for a given numerical Series with optional customization.
 
@@ -322,8 +326,7 @@ def plot_hue_histogram(df, x_col='', hue_col='', bins=30, color='grey', title=''
 # plot_dual_histogram(ds1=ages_no_show, ds2=ages_showed_up, bins=18, color1='tomato', color2='mediumseagreen', 
 #                     title='Age Distribution: No-Show vs Show', xlabel='Age', ylabel='Number of Patients', label1='No Show',
 #                     label2='Showed Up', xticks_range=(0, 100, 10), yticks_range=(0, 80, 10), rotation=45)
-def plot_dual_histogram(ds1, ds2, bins=10, color1='black', color2='grey',
-                        title='Histogram Comparison', xlabel='', ylabel='',
+def plot_dual_histogram(ds1, ds2, bins=10, color1='black', color2='grey', title='Histogram Comparison', xlabel='', ylabel='',
                         label1='', label2='', xticks_range=None, yticks_range=None, rotation=0):
     """
     Plots two overlapping histograms to visually compare distributions.
@@ -384,8 +387,8 @@ def plot_dual_histogram(ds1, ds2, bins=10, color1='black', color2='grey',
     plt.show()
 
 # Function to plot a frequency density histogram with optional KDE overlay
-# plot_frequency_density(ds=series1, bins=np.arange(0, 1200, 50), color='grey', title='Frequency Density of Duration', xlabel='Duration (minutes)',
-#                        ylabel='Density', xticks_range=(0, 1200, 100), show_kde=True, rotation=45)
+# plot_frequency_density(ds=series1, bins=np.arange(0, 1200, 50), color='grey', title='Frequency Density of Duration', 
+#                        xlabel='Duration (minutes)', ylabel='Density', xticks_range=(0, 1200, 100), show_kde=True, rotation=45)
 def plot_frequency_density(ds, bins=10, color='grey', title='', xlabel='', ylabel='Density',
                            xticks_range=None, rotation=0, show_kde=True):
     """
@@ -436,9 +439,8 @@ def plot_frequency_density(ds, bins=10, color='grey', title='', xlabel='', ylabe
 # plot_grouped_barplot(ds=dataframe, x_col='month', y_col='median_duration', hue_col='plan', palette=['black', 'grey'],
 #                      title='Average Call Duration by Plan and Month', xlabel='Month', ylabel='Average Call Duration (min)',
 #                      xticks_range=range(0, 13, 1), yticks_range=range(0, 500, 50), rotation=65)
-def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palette("PRGn", n_colors=50),
-                         title='', xlabel='', ylabel='', xticks_range=None,
-                         yticks_range=None, x_rotation=0, y_rotation=0, alpha=0.95):
+def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palette("PRGn", n_colors=50), title='', xlabel='', ylabel='', 
+                         xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0, alpha=0.95):
     """
     Plots a grouped bar chart with categorical grouping (hue).
 
@@ -480,8 +482,7 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
 # Function to plot a horizontal bar chart from categorical data
 # plot_horizontal_bar(ds=series_categorica, colors=['skyblue', 'salmon', 'lightgreen'], xlabel='Count', ylabel='Categories',
 #                     title='Distribution of Categorical Values', xticks_range=(0, 100, 10), rotation=0)
-def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', title='',
-                        xticks_range=None, rotation=0):
+def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', title='', xticks_range=None, rotation=0):
     """
     Plots a horizontal bar chart for a categorical pandas Series.
 
@@ -746,3 +747,4 @@ def plot_bar_comp(df, x_col, y_col, title, xlabel, ylabel, color1='black', color
     plt.legend()
     plt.tight_layout()
     plt.show()
+    

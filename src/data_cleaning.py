@@ -22,8 +22,7 @@ def check_existing_missing_values(df):
     """
 
     # Common non-standard representations of missing values
-    missing_values = ['', ' ', 'N/A', 'none', 'None',
-                      'null', 'NULL', 'NaN', 'nan', 'NAN', 'nat', 'NaT']
+    missing_values = ['', ' ', 'N/A', 'none', 'None','null', 'NULL', 'NaN', 'nan', 'NAN', 'nat', 'NaT']
 
     display(HTML(f"<h4>Scanning for Non-Standard Missing Values</h4>"))
 
@@ -46,8 +45,6 @@ def check_existing_missing_values(df):
     return None
 
 # Function to standardize non-standard missing values to pd.NA
-
-
 def replace_missing_values(df, include=None, exclude=None):
     """
     Replaces common non-standard missing value entries in object-type columns with pd.NA.
@@ -61,8 +58,7 @@ def replace_missing_values(df, include=None, exclude=None):
     DataFrame: Updated DataFrame with non-standard missing values replaced by pd.NA.
     """
 
-    missing_values = ['', ' ', 'N/A', 'none', 'None',
-                      'null', 'NULL', 'NaN', 'nan', 'NAN', 'nat', 'NaT']
+    missing_values = ['', ' ', 'N/A', 'none', 'None', 'null', 'NULL', 'NaN', 'nan', 'NAN', 'nat', 'NaT']
 
     if exclude is None:
         exclude = []
@@ -79,8 +75,6 @@ def replace_missing_values(df, include=None, exclude=None):
     return df
 
 # Function to normalize string formatting in object-type columns
-
-
 def normalize_string_format(df, include=None, exclude=None):
     """
     Standardizes text formatting for object-type (string) columns in a DataFrame.
@@ -113,9 +107,10 @@ def normalize_string_format(df, include=None, exclude=None):
         if df[column].dtype == 'object':
             df[column] = df[column].str.lower()
             df[column] = df[column].str.strip()
-            df[column] = df[column].str.replace(r'[^\w\s,]', ' ', regex=True)
+            df[column] = df[column].str.replace(r'[^\w\s]', ' ', regex=True)
             df[column] = df[column].str.replace(r'\s+', '_', regex=True)
             df[column] = df[column].str.replace(r'__+', '_', regex=True)
+            df[column] = df[column].str.replace(r'_(?=\s|$)', '', regex=True)
 
     return df
 
@@ -152,8 +147,6 @@ def normalize_columns_headers_format(df):
     return df
 
 # Function to detect potential implicit duplicates using fuzzy matching and normalization
-
-
 def detect_implicit_duplicates_token(df, include=None, exclude=None, fuzzy_threshold=0.85):
     """
     Identifies implicit (non-exact) duplicates within string-based columns using normalization,
@@ -232,8 +225,6 @@ def detect_implicit_duplicates_token(df, include=None, exclude=None, fuzzy_thres
     return None
 
 # Function to normalize text
-
-
 def normalize_string(text):
     """
     Normalize a text string for comparison and deduplication.
@@ -265,8 +256,6 @@ def normalize_string(text):
     return text
 
 # Function to detect implicit duplicates
-
-
 def detect_implicit_duplicates_fuzzy(df, column, threshold=90, show_progress=True):
     """
     Detect and display implicit duplicate values in a specified column using fuzzy string matching.
@@ -327,15 +316,13 @@ def detect_implicit_duplicates_fuzzy(df, column, threshold=90, show_progress=Tru
         if name in visited:
             continue
         matches = process.extract(name, unique_names, limit=None)
-        similar = [match_name for match_name,
-                   score in matches if score >= threshold and match_name != name]
+        similar = [match_name for match_name, score in matches if score >= threshold and match_name != name]
         if similar:
             duplicates[name] = similar
             visited.update(similar + [name])
 
     if not duplicates:
-        display(HTML(
-            "> <b>No</b> <i>implicit duplicates</i> found based on the current threshold."))
+        display(HTML("> <b>No</b> <i>implicit duplicates</i> found based on the current threshold."))
     else:
         display(HTML("> <i>Implicit duplicates</i> <b>detected</b>:"))
         for canonical, variants in duplicates.items():
@@ -344,8 +331,6 @@ def detect_implicit_duplicates_fuzzy(df, column, threshold=90, show_progress=Tru
     return None
 
 # Function to convert string-based date/time columns to timezone-aware datetime or time objects
-
-
 def normalize_datetime(df, include=None, exclude=None, frmt=None, time_zone='UTC'):
     """
     Converts string-based columns in a DataFrame to datetime or time objects,
@@ -372,8 +357,7 @@ def normalize_datetime(df, include=None, exclude=None, frmt=None, time_zone='UTC
 
     for column in target_columns:
         if pd.api.types.is_object_dtype(df[column]) or pd.api.types.is_string_dtype(df[column]):
-            df[column] = pd.to_datetime(
-                df[column], format=frmt, errors='coerce')
+            df[column] = pd.to_datetime(df[column], format=frmt, errors='coerce')
 
         if pd.api.types.is_datetime64_any_dtype(df[column]):
             if frmt in ["%H:%M:%S", "%H:%M"]:
@@ -387,8 +371,6 @@ def normalize_datetime(df, include=None, exclude=None, frmt=None, time_zone='UTC
     return df
 
 # Function to identify values that fail numeric conversion or are not whole numbers
-
-
 def find_fail_conversion_to_numeric(df, column):
     """
     Identifies problematic entries in a column during numeric conversion.
@@ -406,8 +388,7 @@ def find_fail_conversion_to_numeric(df, column):
     """
 
     # Find non-numeric values (e.g., strings, symbols)
-    mask = pd.to_numeric(
-        df[column], errors='coerce').isna() & df[column].notna()
+    mask = pd.to_numeric(df[column], errors='coerce').isna() & df[column].notna()
     non_numeric_values = df.loc[mask, column]
 
     if not non_numeric_values.empty:
@@ -421,16 +402,13 @@ def find_fail_conversion_to_numeric(df, column):
     non_integer_values = df.loc[decimal_mask, column]
 
     if not non_integer_values.empty:
-        print(
-            f"> Numeric values that are not whole integers found in column '{column}':")
+        print(f"> Numeric values that are not whole integers found in column '{column}':")
         print(non_integer_values)
         print(f"> Total non-integer entries: {non_integer_values.shape[0]}\n")
 
     return None
 
 # Function to convert columns to numeric types (integer or float) with error detection
-
-
 def convert_object_to_numeric(df, type=None, include=None, exclude=None):
     """
     Converts specified DataFrame columns to numeric types, with optional control over integer vs float conversion.
@@ -458,8 +436,7 @@ def convert_object_to_numeric(df, type=None, include=None, exclude=None):
         if type == 'integer':
             try:
                 if np.array_equal(df[column], df[column].astype(int)):
-                    df[column] = pd.to_numeric(
-                        df[column], downcast='integer', errors='coerce')
+                    df[column] = pd.to_numeric(df[column], downcast='integer', errors='coerce')
                 else:
                     find_errors_to_numeric(df, column)
             except Exception:
@@ -467,8 +444,7 @@ def convert_object_to_numeric(df, type=None, include=None, exclude=None):
 
         # Float conversion
         elif type == 'float':
-            df[column] = pd.to_numeric(
-                df[column], downcast='float', errors='coerce')
+            df[column] = pd.to_numeric(df[column], downcast='float', errors='coerce')
 
         # Auto conversion
         else:
@@ -485,8 +461,6 @@ def convert_object_to_numeric(df, type=None, include=None, exclude=None):
     return df
 
 # Function to convert integer columns to boolean (True/False)
-
-
 def convert_integer_to_boolean(df, include=None, exclude=None):
     """
     Converts eligible integer-type columns in a DataFrame to boolean (True/False),
@@ -516,8 +490,6 @@ def convert_integer_to_boolean(df, include=None, exclude=None):
     return df
 
 # Function to convert abbreviated gender values (e.g., 'm', 'f') to full terms ('male', 'female')
-
-
 def standardize_gender_values(df, include=None, exclude=None):
     """
     Standardizes gender representations in object-type columns by converting
@@ -547,8 +519,6 @@ def standardize_gender_values(df, include=None, exclude=None):
     return df
 
 # Normalize numeric day to string day
-
-
 def convert_numday_strday(df, include=None, exclude=None):
     """
     Converts numeric day columns (0-6) to string day names using a predefined mapping.
@@ -595,10 +565,8 @@ def convert_numday_strday(df, include=None, exclude=None):
             if df[column].dropna().isin(map_day.keys()).all():
                 df[column] = df[column].map(map_day)
             else:
-                display(HTML(
-                    f"> Column '<i>{column}</i>' contains values outside <b>0-6</b>. Skipping..."))
+                display(HTML(f"> Column '<i>{column}</i>' contains values outside <b>0-6</b>. Skipping..."))
         else:
-            display(
-                HTML(f"> Column '<i>{column}</i>' is <b>not numeric</b>. Skipping..."))
+            display(HTML(f"> Column '<i>{column}</i>' is <b>not numeric</b>. Skipping..."))
 
     return df
