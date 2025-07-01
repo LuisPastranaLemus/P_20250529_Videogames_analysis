@@ -115,8 +115,6 @@ def normalize_string_format(df, include=None, exclude=None):
     return df
 
 # Function to normalize column header formats for consistency
-
-
 def normalize_columns_headers_format(df):
     """
     Standardizes the format of column headers in a DataFrame by:
@@ -274,7 +272,7 @@ def detect_implicit_duplicates_fuzzy(df, column, threshold=90, show_progress=Tru
         The name of the column to search for implicit duplicates. Values must be text-like.
 
     threshold : int, optional (default=90)
-        The similarity score threshold (0–100) to consider two values as duplicates.
+        The similarity score threshold (0-100) to consider two values as duplicates.
         Higher values mean stricter matching.
 
     show_progress : bool, optional (default=True)
@@ -294,7 +292,7 @@ def detect_implicit_duplicates_fuzzy(df, column, threshold=90, show_progress=Tru
 
     Example
     -------
-    >>> find_implicit_duplicates_only(df, column='product_name', threshold=90)
+    >>> detect_implicit_duplicates_fuzzy(df, column='product_name', threshold=90)
     > Scanning for duplicates ...
     > Implicit duplicates detected:
     'coca cola'  ⇨  ['coca-cola', 'cocacola', 'COCA COLA®']
