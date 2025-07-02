@@ -69,7 +69,7 @@ def replace_missing_values(df, include=None, exclude=None):
         available_columns = [col for col in include if col not in exclude]
 
     for column in available_columns:
-        if df[column].dtype == 'object' and df[column].isin(missing_values).any():
+        if df[column].dtype in ['object', 'string'] and df[column].isin(missing_values).any():
             df[column] = df[column].replace(missing_values, pd.NA)
 
     return df
@@ -104,7 +104,7 @@ def normalize_string_format(df, include=None, exclude=None):
         available_columns = [col for col in include if col not in exclude]
 
     for column in available_columns:
-        if df[column].dtype == 'object':
+        if df[column].dtype in ['object', 'string']:
             df[column] = df[column].str.lower()
             df[column] = df[column].str.strip()
             df[column] = df[column].str.replace(r'[^\w\s]', ' ', regex=True)
@@ -511,7 +511,7 @@ def standardize_gender_values(df, include=None, exclude=None):
         available_columns = [col for col in include if col not in exclude]
 
     for column in available_columns:
-        if df[column].dtype == 'object':
+        if df[column].dtype in ['object', 'string']:
             df[column] = df[column].replace({'f': 'female', 'm': 'male'})
 
     return df

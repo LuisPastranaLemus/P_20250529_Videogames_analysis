@@ -41,7 +41,10 @@ try:
                       plot_scatter_matrix,
                       plot_scatter,
                       plot_ecdf,
-                      plot_bar_comp)
+                      plot_bar_comp,
+                      plot_distribution_dispersion)
+    
+    from .features import(cast_datatypes)
 
     from .utils import (format_notebook)
 
@@ -89,5 +92,8 @@ __all__ = ['load_dataset_from_zip',
            'plot_scatter',
            'plot_ecdf',
            'plot_bar_comp',
+           'plot_distribution_dispersion',
+           
+           'cast_datatypes',
 
            'format_notebook']

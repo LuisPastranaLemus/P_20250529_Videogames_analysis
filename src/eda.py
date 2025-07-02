@@ -96,37 +96,62 @@ def evaluate_correlation(df):
     Evaluates pairwise Pearson correlations between numerical columns in a DataFrame.
     
     Parameters:
-    df (DataFrame): The input DataFrame with at least two numerical columns.
+    - df (DataFrame): Input DataFrame with at least two numeric columns.
     
     Output:
-    Displays correlation coefficients with interpretation levels:
-    - Strong correlation (>|0.7|)
-    - Moderate correlation (0.3 < |r| ≤ 0.7)
-    - No linear relationship (r = 0)
-    - Negative correlations (inverted relationship)
+    - Displays correlation coefficients with interpretation:
+        > Strong correlation (|r| > 0.7)
+        > Moderate correlation (0.3 < |r| ≤ 0.7)
+        > Weak or no linear relationship (|r| ≤ 0.3)
+        > Positive vs. Negative direction
     """
-    
-    for column_x in df.columns:
-        if df[column_x].dtype != 'object':
-            for column_y in df.columns:
-                if df[column_y].dtype != 'object' and column_x != column_y:
-                    corr_value = df[column_x].corr(df[column_y])
-                    
-                    if 0.7 < corr_value <= 1.0:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
-                                     <b>Strong positive correlation</b>"))
-                    elif 0.3 < corr_value <= 0.7:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
-                                     <b>Moderate positive correlation</b>"))
-                    elif corr_value == 0:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
-                                     <b>No linear relationship</b>"))
-                    elif -0.7 < corr_value <= -0.3:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
-                                     <b>Moderate negative correlation</b>"))
-                    elif -1.0 <= corr_value <= -0.7:
-                        display(HTML(f"> Correlation (<i>{column_x}</i>, <i>{column_y}</i>): <b>{corr_value:.2f}</b><br>\
-                                     <b>Strong negative correlation</b>"))
+
+    numeric_cols = df.select_dtypes(include='number').columns
+
+    seen_pairs = set()
+
+    for col_x in numeric_cols:
+        for col_y in numeric_cols:
+            if col_x != col_y and (col_y, col_x) not in seen_pairs:
+                corr = df[col_x].corr(df[col_y])
+
+                strength = ''
+                direction = 'positive' if corr > 0 else 'negative' if corr < 0 else 'neutral'
+
+                abs_corr = abs(corr)
+                if abs_corr > 0.7:
+                    strength = 'Strong'
+                elif abs_corr > 0.3:
+                    strength = 'Moderate'
+                elif abs_corr == 0:
+                    strength = 'No linear relationship'
+                else:
+                    strength = 'Weak'
+
+                if abs_corr > 0:
+                    if strength in ['Strong', 'Moderate']:  
+                        display(HTML(
+                            f"> Correlation (<i>{col_x}</i>, <i>{col_y}</i>): <b>{corr:.2f}</b><br>"
+                            f"<b>{strength} {direction} correlation</b><br><br>"
+                        ))
+                    else:
+                        display(HTML(
+                            f"> Correlation (<i>{col_x}</i>, <i>{col_y}</i>): <b>{corr:.2f}</b><br>"
+                            f"{strength} {direction} correlation<br><br>"
+                        ))
+                else:
+                    if strength in ['Strong', 'Moderate']: 
+                        display(HTML(
+                            f"> Correlation (<i>{col_x}</i>, <i>{col_y}</i>): <b>{corr:.2f}</b><br>"
+                            f"<b>{strength}</b><br><br>"
+                        ))
+                    else:
+                        display(HTML(
+                            f"> Correlation (<i>{col_x}</i>, <i>{col_y}</i>): <b>{corr:.2f}</b><br>"
+                            f"{strength}<br><br>"
+                        ))
+                        
+                seen_pairs.add((col_x, col_y))
 
 # Function to visualize missing values within a DataFrame using a heatmap
 def missing_values_heatmap(df):
@@ -183,7 +208,7 @@ def plot_heatmap(data, title='', xlabel='', ylabel='', cmap='YlGnBu', annot=True
 # plot_boxplots(ds_list=[serie1, serie2, serie3], xlabels=['Group A', 'Group B', 'Group C'], ylabel='Values', 
 #               title='Comparison of Value Distributions Across Groups', yticks_range=(0, 40, 5), rotation=45,
 #               color=['skyblue', 'lightgreen', 'salmon']
-def plot_boxplots(ds_list, xlabels, ylabel, title, yticks_range=None, rotation=0, color='grey'):
+def plot_boxplots(ds_list, xlabels, ylabel, title, yticks_range=None, rotation=0, color='grey', showfliers=True):
     """
     Plots multiple boxplots side by side, allowing for visual comparison across groups.
 
@@ -216,9 +241,9 @@ def plot_boxplots(ds_list, xlabels, ylabel, title, yticks_range=None, rotation=0
     # If color is a list, assign a custom palette; if string, use a solid color
     if isinstance(color, (list, tuple)) and len(color) == len(xlabels):
         palette = dict(zip(xlabels, color))
-        sns.boxplot(x='group', y='value', hue='group', data=df, palette=palette)
+        sns.boxplot(x='group', y='value', hue='group', data=df, palette=palette, showfliers=showfliers)
     else:
-        sns.boxplot(x='group', y='value', data=df, color=color)
+        sns.boxplot(x='group', y='value', data=df, color=color, showfliers=showfliers)
 
     plt.ylabel(ylabel)
     plt.title(title)
@@ -440,7 +465,7 @@ def plot_frequency_density(ds, bins=10, color='grey', title='', xlabel='', ylabe
 #                      title='Average Call Duration by Plan and Month', xlabel='Month', ylabel='Average Call Duration (min)',
 #                      xticks_range=range(0, 13, 1), yticks_range=range(0, 500, 50), rotation=65)
 def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palette("PRGn", n_colors=50), title='', xlabel='', ylabel='', 
-                         xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0, alpha=0.95):
+                         xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0, alpha=0.95, show_legend=True):
     """
     Plots a grouped bar chart with categorical grouping (hue).
 
@@ -455,7 +480,10 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
     ylabel (str): Label for the y-axis.
     xticks_range (range, optional): Tick range and step for the x-axis.
     yticks_range (range, optional): Tick range and step for the y-axis.
-    rotation (int): Rotation angle for tick labels.
+    x_rotation (int): Rotation angle for x-axis ticks.
+    y_rotation (int): Rotation angle for y-axis ticks.
+    alpha (float): Transparency of bars.
+    show_legend (bool): Whether to display the legend (default: True).
 
     Output:
     Displays a grouped bar plot with optional axis customization and legend.
@@ -472,8 +500,16 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
 
     if xticks_range is not None:
         plt.xticks(ticks=xticks_range, rotation=x_rotation)
+    else:
+        plt.xticks(rotation=x_rotation)
+
     if yticks_range is not None:
         plt.yticks(ticks=yticks_range, rotation=y_rotation)
+    else:
+        plt.yticks(rotation=y_rotation)
+    
+    if not show_legend:
+        plt.legend().remove()
 
     plt.grid(True)
     plt.tight_layout()
@@ -747,4 +783,66 @@ def plot_bar_comp(df, x_col, y_col, title, xlabel, ylabel, color1='black', color
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+# Plots a frequency density histogram with KDE, showing distribution shape and key statistics.
+# Highlights mean, median, ±1σ, ±2σ, ±3σ boundaries, and marks outliers beyond 3σ.
+# plot_distribution_with_statistics(df, 'sales', bins=10)
+def plot_distribution_dispersion(data, column_name, bins=30, color='grey'):
+    """
+    Plot a frequency density histogram with KDE and key distribution statistics.
+
+    Parameters:
+    - data: DataFrame containing the data.
+    - column_name: Name of the column to analyze.
+    - bins: Number of bins for the histogram.
+    - color: Base color for histogram and KDE (default: 'skyblue').
+
+    Displays:
+    - Histogram (frequency density) with KDE.
+    - Mean, median lines.
+    - ±1σ, ±2σ, ±3σ boundaries.
+    - Outliers marked beyond 3σ.
+    """
     
+    values = data[column_name].dropna()
+
+    # Basic stats
+    mean = values.mean()
+    median = values.median()
+    std = values.std()
+
+    # Sigma boundaries
+    sigma_bounds = {
+        '1σ': (mean - std, mean + std),
+        '2σ': (mean - 2*std, mean + 2*std),
+        '3σ': (mean - 3*std, mean + 3*std)
+    }
+
+    plt.figure(figsize=(14, 7))
+
+    # Frequency density histogram with KDE
+    sns.histplot(values, bins=bins, kde=True, stat='density',
+                 color=color, edgecolor='black', alpha=0.6)
+
+    # Mean and median
+    plt.axvline(mean, color='red', linestyle='--', linewidth=2, label=f'Mean: {mean:.2f}')
+    plt.axvline(median, color='orange', linestyle=':', linewidth=2, label=f'Median: {median:.2f}')
+
+    # Sigma boundaries
+    colors = ['green', 'blue', 'purple']
+    for i, (label, (low, high)) in enumerate(sigma_bounds.items()):
+        plt.axvline(low, color=colors[i], linestyle='--', alpha=0.7, label=f'{label} Lower: {low:.2f}')
+        plt.axvline(high, color=colors[i], linestyle='--', alpha=0.7, label=f'{label} Upper: {high:.2f}')
+    
+    # Outliers (beyond 3σ)
+    outliers = values[(values < sigma_bounds['3σ'][0]) | (values > sigma_bounds['3σ'][1])]
+    if not outliers.empty:
+        plt.scatter(outliers, np.zeros_like(outliers), color='black', s=40, label='Outliers (3σ+)', marker='x')
+
+    plt.title(f'Distribution of {column_name} with Statistical Boundaries')
+    plt.xlabel(column_name)
+    plt.ylabel('Frequency Density')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
