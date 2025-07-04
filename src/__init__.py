@@ -42,7 +42,8 @@ try:
                       plot_scatter,
                       plot_ecdf,
                       plot_bar_comp,
-                      plot_distribution_dispersion)
+                      plot_distribution_dispersion,
+                      plot_bar_series)
     
     from .features import(cast_datatypes)
 
@@ -93,6 +94,7 @@ __all__ = ['load_dataset_from_zip',
            'plot_ecdf',
            'plot_bar_comp',
            'plot_distribution_dispersion',
+           'plot_bar_series',
            
            'cast_datatypes',
 

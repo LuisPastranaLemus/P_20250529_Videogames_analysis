@@ -465,7 +465,7 @@ def plot_frequency_density(ds, bins=10, color='grey', title='', xlabel='', ylabe
 #                      title='Average Call Duration by Plan and Month', xlabel='Month', ylabel='Average Call Duration (min)',
 #                      xticks_range=range(0, 13, 1), yticks_range=range(0, 500, 50), rotation=65)
 def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palette("PRGn", n_colors=50), title='', xlabel='', ylabel='', 
-                         xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0, alpha=0.95, show_legend=True):
+                         xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0, alpha=0.95, show_legend=True, show_values=True):
     """
     Plots a grouped bar chart with categorical grouping (hue).
 
@@ -484,6 +484,7 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
     y_rotation (int): Rotation angle for y-axis ticks.
     alpha (float): Transparency of bars.
     show_legend (bool): Whether to display the legend (default: True).
+    show_values (bool): Whether to display value labels on top of bars.
 
     Output:
     Displays a grouped bar plot with optional axis customization and legend.
@@ -493,6 +494,16 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
     palette = palette
     strong_palette = palette[:13] + palette[-12:]
     sns.barplot(data=ds, x=x_col, y=y_col, hue=hue_col, palette=strong_palette, alpha=alpha)
+    
+    if show_values:
+        for container in ax.containers:
+            for bar in container:
+                height = bar.get_height()
+                if not pd.isna(height):
+                    ax.text(bar.get_x() + bar.get_width() / 2,
+                            height + (0.01 * height),
+                            f'{height:.2f}',
+                            ha='center', va='bottom', fontsize=8)
 
     plt.title(title)
     plt.xlabel(xlabel)
@@ -518,7 +529,7 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
 # Function to plot a horizontal bar chart from categorical data
 # plot_horizontal_bar(ds=series_categorica, colors=['skyblue', 'salmon', 'lightgreen'], xlabel='Count', ylabel='Categories',
 #                     title='Distribution of Categorical Values', xticks_range=(0, 100, 10), rotation=0)
-def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', title='', xticks_range=None, rotation=0):
+def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', title='', xticks_range=None, rotation=0, show_values=True):
     """
     Plots a horizontal bar chart for a categorical pandas Series.
 
@@ -530,6 +541,7 @@ def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', titl
     title (str): Title of the plot.
     xticks_range (tuple, optional): Tuple (min, max, step) for x-axis ticks.
     rotation (int): Rotation angle for x-axis tick labels.
+    show_values (bool): Whether to display the value at the end of each bar.
 
     Output:
     Displays a horizontal bar chart with optional hue differentiation.
@@ -539,7 +551,11 @@ def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', titl
     values = ds.value_counts().values
 
     plt.figure(figsize=(15, 7))
-    sns.barplot(y=categories, x=values, hue=categories, dodge=False, palette=colors)
+    ax = sns.barplot(y=categories, x=values, hue=categories, dodge=False, palette=colors)
+    
+    if show_values:
+        for i, v in enumerate(values):
+            ax.text(v + max(values)*0.01, i, f'{v}', va='center', fontsize=9)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -555,7 +571,7 @@ def plot_horizontal_bar(ds, colors=['black', 'grey'], xlabel='', ylabel='', titl
 # Function to plot grouped bar charts from a DataFrame with multiple columns
 # plot_grouped_bars(df=music_activity_df.set_index('city'), title='Music Activity per City', xlabel='City', ylabel='Activity Count',
 #                   x_rotation=45, y_rotation=0, grid_axis='y')
-def plot_grouped_bars(df, title='', xlabel='', ylabel='', x_rotation=0, y_rotation=0, grid_axis='y', color='grey'):
+def plot_grouped_bars(df, title='', xlabel='', ylabel='', x_rotation=0, y_rotation=0, grid_axis='y', color='grey', show_values=True):
     """
     Plots grouped (clustered) bar charts for comparing multiple categories across an index.
 
@@ -567,12 +583,22 @@ def plot_grouped_bars(df, title='', xlabel='', ylabel='', x_rotation=0, y_rotati
     x_rotation (int): Rotation angle for x-axis tick labels.
     y_rotation (int): Rotation angle for y-axis tick labels.
     grid_axis (str): Axis along which to display grid lines ('x', 'y', or 'both').
+    show_values (bool): Whether to display values on top of each bar.
 
     Output:
     Displays a grouped bar chart comparing values across index categories and columns.
     """
 
-    df.plot(kind='bar', figsize=(15, 7), color=color)
+    ax = df.plot(kind='bar', figsize=(15, 7), color=color)
+    
+    if show_values:
+        for container in ax.containers:
+            for bar in container:
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width() / 2,
+                        height + (0.01 * height),
+                        f'{height:.2f}',
+                        ha='center', va='bottom', fontsize=8)
 
     plt.title(title)
     plt.xlabel(xlabel)
@@ -587,7 +613,7 @@ def plot_grouped_bars(df, title='', xlabel='', ylabel='', x_rotation=0, y_rotati
 # Function to plot a grouped bar chart with a specified index column
 # plot_grouped_bars_indx(df=music_df, index_name='city', title='Music Activity per City', xlabel='City', ylabel='Activity Count',
 #                        rotation=45, grid_axis='y')
-def plot_grouped_bars_indx(df, index_name='', title='', xlabel='', ylabel='', rotation=0, grid_axis='y', color='grey'):
+def plot_grouped_bars_indx(df, index_name='', title='', xlabel='', ylabel='', rotation=0, grid_axis='y', color='grey', show_values=True):
     """
     Plots a grouped bar chart where rows are grouped by a specified index column
     (e.g., city) and bars represent multiple numeric columns.
@@ -600,13 +626,14 @@ def plot_grouped_bars_indx(df, index_name='', title='', xlabel='', ylabel='', ro
     ylabel (str): Label for the y-axis.
     rotation (int): Rotation angle for x-axis tick labels.
     grid_axis (str): Axis to show grid lines on ('x', 'y', or 'both').
+    show_values (bool): Whether to display the value above each bar.
 
     Returns:
     None: Displays the bar chart.
     """
 
     df_plot = df.set_index(index_name)
-    df_plot.plot(kind='bar', figsize=(15, 7), color=color)
+    ax = df_plot.plot(kind='bar', figsize=(15, 7), color=color)
 
     plt.title(title)
     plt.xlabel(xlabel)
@@ -614,6 +641,19 @@ def plot_grouped_bars_indx(df, index_name='', title='', xlabel='', ylabel='', ro
     plt.xticks(rotation=rotation)
     plt.grid(axis=grid_axis)
     plt.tight_layout()
+    
+    if show_values:
+        for container in ax.containers:
+            for bar in container:
+                height = bar.get_height()
+                if height > 0:  # avoid placing labels on zero-height bars
+                    ax.text(
+                        bar.get_x() + bar.get_width() / 2,
+                        height + 0.01 * height,
+                        f'{height:.2f}',
+                        ha='center', va='bottom', fontsize=8
+                    )
+    
     plt.show()
 
 # Function to generate a customizable seaborn pairplot for exploratory correlation analysis
@@ -752,7 +792,7 @@ def plot_ecdf(df, x_col, threshold=None, title=None, xlabel=None, ylabel='Cumula
 # Function to plot ECDF - Empirical Cumulative Distribution Function.
 # plot_plan_revenue_by_city(df_city_revenue, color1='darkblue', color2='silver', title='Ingresos por ciudad y plan')
 def plot_bar_comp(df, x_col, y_col, title, xlabel, ylabel, color1='black', color2='grey', alpha2=0.7,
-                  figsize=(15, 7), rotation=0, fontsize=8):
+                  figsize=(15, 7), rotation=0, fontsize=8, show_values=True):
     """
     Plots a grouped bar chart comparing revenue by city for two different plans.
 
@@ -770,10 +810,21 @@ def plot_bar_comp(df, x_col, y_col, title, xlabel, ylabel, color1='black', color
     - figsize: Size of the figure
     - rotation: Rotation angle for x-axis labels
     - fontsize: Font size for x-axis labels
+    - show_values: Whether to display the value above each bar
     """
     plt.figure(figsize=figsize)
-    plt.bar(df[x_col], df[y_col[0]], label=y_col[0].upper(), color=color1)
-    plt.bar(df[x_col], df[y_col[1]], label=y_col[1].upper(), color=color2, alpha=alpha2)
+    bars1 = plt.bar(df[x_col], df[y_col[0]], label=y_col[0].upper(), color=color1)
+    bars2 = plt.bar(df[x_col], df[y_col[1]], label=y_col[1].upper(), color=color2, alpha=alpha2)
+
+    if show_values:
+        for bar in bars1:
+            height = bar.get_height()
+            plt.text(bar.get_x() + bar.get_width() / 2, height + 0.01 * height, f'{height:.2f}',
+                     ha='center', va='bottom', fontsize=8)
+        for bar in bars2:
+            height = bar.get_height()
+            plt.text(bar.get_x() + bar.get_width() / 2, height + 0.01 * height, f'{height:.2f}',
+                     ha='center', va='bottom', fontsize=8)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -818,7 +869,7 @@ def plot_distribution_dispersion(data, column_name, bins=30, color='grey'):
         '3σ': (mean - 3*std, mean + 3*std)
     }
 
-    plt.figure(figsize=(14, 7))
+    plt.figure(figsize=(15, 7))
 
     # Frequency density histogram with KDE
     sns.histplot(values, bins=bins, kde=True, stat='density',
@@ -845,4 +896,54 @@ def plot_distribution_dispersion(data, column_name, bins=30, color='grey'):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
+    plt.show()
+
+# Plots a vertical bar chart from a pandas Series with customizable labels, size, and ticks.
+# plot_bar_from_series(sales_series, title='Total Sales by Platform and Year', xlabel='Platform - Year', ylabel='Total Sales (millions)',
+#                      color='salmon', xticks=['Año 2015 - PS4', 'Año 2016 - PS4', 'Año 2015 - X360'], yticks=[0, 5, 10, 15])
+def plot_bar_series(series, title='', xlabel='', ylabel='', figsize=(15, 7), color=None, rotation=45, show_values=True, xticks=None, 
+                    yticks=None):
+    """
+    Crea una gráfica de barras verticales a partir de una Pandas Series.
+
+    Parámetros:
+    - series: pd.Series — Serie con índices como categorías y valores numéricos.
+    - title: str — Título de la gráfica.
+    - xlabel: str — Etiqueta del eje X.
+    - ylabel: str — Etiqueta del eje Y.
+    - figsize: tuple — Tamaño de la figura (ancho, alto).
+    - color: str o lista — Color(es) de las barras.
+    - rotation: int — Rotación de las etiquetas en el eje X.
+    - show_values: bool — Mostrar los valores encima de las barras.
+    - xticks: list o None — Lista personalizada de valores para el eje X.
+    - yticks: list o None — Lista personalizada de valores para el eje Y.
+
+    Retorna:
+    - fig, ax: objetos matplotlib.
+    """
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    series.plot(kind='bar', ax=ax, color=color)
+
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.tick_params(axis='x', rotation=rotation)
+
+    # Personalización de ticks
+    if xticks is not None:
+        ax.set_xticks(range(len(xticks)))
+        ax.set_xticklabels(xticks)
+
+    if yticks is not None:
+        ax.set_yticks(yticks)
+
+    # Mostrar valores encima de las barras
+    if show_values:
+        for i, val in enumerate(series):
+            ax.text(i, val + max(series)*0.01, f'{val:.2f}', ha='center', va='bottom', fontsize=9)
+
+    plt.tight_layout()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
