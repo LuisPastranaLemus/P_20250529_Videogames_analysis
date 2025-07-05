@@ -19,10 +19,7 @@ Key questions:
 - Choose the platforms with the highest total sales and construct a distribution based on each year's data. 
 - Look for platforms that used to be popular but are now losing sales. 
 - How long does it generally take for new platforms to appear and old ones to disappear?
-- __Determine__ which period you should collect data for.
-- Work only with the data you consider relevant. Ignore data from previous years.
-- Which platforms are leading in sales? 
-- Which ones are growing and which ones are declining? 
+- Determine which period you should collect data for.
 - Choose several potentially profitable platforms.
 - Show the average sales across various platforms? 
 - See how user and professional reviews affect sales for a popular platform (your choice). 
@@ -31,12 +28,6 @@ Key questions:
 - Take a look at the overall distribution of games by genre. 
 - What can be said about the most profitable genres? 
 - Can you generalize about genres with high and low sales?
-
-- Create a user profile for each region
-    For each region (NA, EU, JP), determine:
-    - The top five platforms. Describe the variations in their market shares from region to region.
-    - The top five genres. Explain the differences.
-    - Whether ESRB ratings affect sales in individual regions.
 
 - Test the following hypotheses:
     - The average user ratings for the Xbox One and PC platforms are the same.

@@ -490,11 +490,11 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
     Displays a grouped bar plot with optional axis customization and legend.
     """
 
-    plt.figure(figsize=(15, 7))
+    fig, ax = plt.subplots(figsize=(15, 7))
     palette = palette
     strong_palette = palette[:13] + palette[-12:]
-    sns.barplot(data=ds, x=x_col, y=y_col, hue=hue_col, palette=strong_palette, alpha=alpha)
-    
+    sns.barplot(data=ds, x=x_col, y=y_col, hue=hue_col, palette=strong_palette, alpha=alpha, ax=ax)
+
     if show_values:
         for container in ax.containers:
             for bar in container:
@@ -505,24 +505,22 @@ def plot_grouped_barplot(ds, x_col, y_col, hue_col=None, palette=sns.color_palet
                             f'{height:.2f}',
                             ha='center', va='bottom', fontsize=8)
 
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
 
     if xticks_range is not None:
-        plt.xticks(ticks=xticks_range, rotation=x_rotation)
-    else:
-        plt.xticks(rotation=x_rotation)
+        ax.set_xticks(ticks=xticks_range)
+    ax.tick_params(axis='x', rotation=x_rotation)
 
     if yticks_range is not None:
-        plt.yticks(ticks=yticks_range, rotation=y_rotation)
-    else:
-        plt.yticks(rotation=y_rotation)
-    
-    if not show_legend:
-        plt.legend().remove()
+        ax.set_yticks(ticks=yticks_range)
+    ax.tick_params(axis='y', rotation=y_rotation)
 
-    plt.grid(True)
+    if not show_legend:
+        ax.legend().remove()
+
+    ax.grid(True)
     plt.tight_layout()
     plt.show()
 
@@ -675,7 +673,7 @@ def plot_pairplot(df, height=3, aspect=2.5, point_color='grey'):
     plt.show()
 
 # Function to plot a scatter matrix for exploring pairwise relationships
-def plot_scatter_matrix(df, figsize=(15, 7), diagonal='hist', color='grey'):
+def plot_scatter_matrix(df, figsize=(15, 7), diagonal='hist', color='grey', alpha=0.3):
     """
     Plots a scatter matrix for all numeric columns in a DataFrame using pandas' plotting tools.
 
@@ -687,7 +685,7 @@ def plot_scatter_matrix(df, figsize=(15, 7), diagonal='hist', color='grey'):
     Returns:
     None: Displays the scatter matrix.
     """
-    pd.plotting.scatter_matrix(df, figsize=figsize, diagonal=diagonal, color=color)
+    pd.plotting.scatter_matrix(df, figsize=figsize, diagonal=diagonal, color=color, alpha=alpha)
     plt.tight_layout()
     plt.show()
 
@@ -695,7 +693,7 @@ def plot_scatter_matrix(df, figsize=(15, 7), diagonal='hist', color='grey'):
 # plot_scatter(df=df_product_purchase, x_col='add_to_cart_order', y_col='reorder_rate', title='Add-to-Cart Order vs Reorder Rate',
 #              xticks_range=range(0, 50, 5), yticks_range=range(0, 2), x_rotation=45, y_rotation=0, alpha=0.4, color='teal')
 def plot_scatter(df, x_col, y_col, title=None, xlabel=None, ylabel=None, figsize=(15, 7), alpha=0.3, color='grey', marker='o',
-                 xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0):
+                 hue=None, palette=None, xticks_range=None, yticks_range=None, x_rotation=0, y_rotation=0):
     """
     Plots a scatterplot for two numerical columns with optional customization.
 
@@ -710,12 +708,18 @@ def plot_scatter(df, x_col, y_col, title=None, xlabel=None, ylabel=None, figsize
     alpha (float): Transparency level for points.
     color (str): Color of the points.
     marker (str): Marker style for scatter points.
-
+    hue (str, optional): Column name to use for color grouping.
+    palette: color palette if hue is used
+    xticks_range (range, optional): Custom range for x-axis ticks.
+    yticks_range (range, optional): Custom range for y-axis ticks.
+    x_rotation (int): Rotation angle for x-axis tick labels.
+    y_rotation (int): Rotation angle for y-axis tick labels.
+    
     Returns:
     None: Displays the plot.
     """
     plt.figure(figsize=figsize)
-    sns.scatterplot(data=df, x=x_col, y=y_col, alpha=alpha, color=color, marker=marker)
+    sns.scatterplot(data=df, x=x_col, y=y_col, hue=hue, alpha=alpha, color=None if hue else color, palette=palette, marker=marker)
 
     plt.title(title if title else f'Scatter: {x_col} vs. {y_col}')
     plt.xlabel(xlabel if xlabel else x_col)
@@ -931,7 +935,6 @@ def plot_bar_series(series, title='', xlabel='', ylabel='', figsize=(15, 7), col
     ax.set_ylabel(ylabel)
     ax.tick_params(axis='x', rotation=rotation)
 
-    # Personalización de ticks
     if xticks is not None:
         ax.set_xticks(range(len(xticks)))
         ax.set_xticklabels(xticks)
@@ -939,11 +942,52 @@ def plot_bar_series(series, title='', xlabel='', ylabel='', figsize=(15, 7), col
     if yticks is not None:
         ax.set_yticks(yticks)
 
-    # Mostrar valores encima de las barras
+    # Show values above bars
     if show_values:
         for i, val in enumerate(series):
             ax.text(i, val + max(series)*0.01, f'{val:.2f}', ha='center', va='bottom', fontsize=9)
 
     plt.tight_layout()
     plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+# Plots horizontal lines.
+#
+def plot_horizontal_lines(df, start_col='', end_col='', y_col='', title='', xlabel='', ylabel='', figsize=(15, 7), marker='o', grid=True, color='tab:grey'):
+    """
+    Plots horizontal lines.
+
+    Parameters:
+    - df: DataFrame containing data.
+    - start_col: column name with the first column values.
+    - end_col: column name with the last column values.
+    - y_col: column name with the oject values.
+    - title: title of the chart.
+    - xlabel: label for the X axis.
+    - ylabel: label for the Y axis.
+    - figsize: figure size (width, height).
+    - marker: marker style for endpoints (default is 'o').
+    - grid: whether to display a grid (default is True).
+    - color: line color (string or list of colors for each platform).
+
+    Returns:
+    - fig, ax: matplotlib figure and axis objects.
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+
+    for i, row in df.iterrows():
+        line_color = color[i] if isinstance(color, list) else color
+        ax.plot([row[start_col], row[end_col]],
+                [row[y_col], row[y_col]],
+                marker=marker,
+                color=line_color)
+
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+
+    if grid:
+        ax.grid(True, linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
     plt.show()
