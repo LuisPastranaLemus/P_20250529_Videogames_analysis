@@ -42,17 +42,17 @@ __Note__: The dataset contains a "rating" column that stores the ESRB rating for
 This project has N different tables.
 
 - `games.csv` (describe content)
-    `Name`: video game's name
-    `Platform`: video games's platform
-    `Year of Release`: video game's realease date
-    `Genre`: video game's genre
-    `NA_sales` (North American sales in millions of US dollars)
-    `EU_sales` (European sales in millions of US dollars)
-    `JP_sales` (Japanese sales in millions of US dollars)
-    `Other_sales` (Other country sales in millions of US dollars)
-    `Critic_Score` (maximum of 100)
-    `User_Score` (maximum of 10)
-    `Rating` (ESRB)
+- `Name`: video game's name
+- `Platform`: video games's platform
+- `Year of Release`: video game's realease date
+- `Genre`: video game's genre
+- `NA_sales` (North American sales in millions of US dollars)
+- `EU_sales` (European sales in millions of US dollars)
+- `JP_sales` (Japanese sales in millions of US dollars)
+- `Other_sales` (Other country sales in millions of US dollars)
+- `Critic_Score` (maximum of 100)
+- `User_Score` (maximum of 10)
+- `Rating` (ESRB)
 
 ---
 
